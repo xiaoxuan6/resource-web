@@ -1,6 +1,15 @@
 # 简述
     将 github 私有库中的笔记，渲染到 web 网站上。
 
+> **Note**
+>
+> 私有库中的笔记文件名格式必须为：`xxx.md`
+>
+> 私有库中的笔记内容格式必须为：
+>
+>       [描述1](https://www.baidu.com)<br>
+>       [描述2](https://www.baidu.com)<br>
+
 # 使用方式
 
 克隆项目
@@ -9,24 +18,26 @@
 git clone https://github.com/xiaoxuan6/resource-web.git
 ```
 
-复制 `.env.example` 为 `.env`, 修改里面的参数为自己的配置。
-
-> **Note**
-> 
-> 私有库中的笔记文件名格式必须为：`xxx.md`
-> 
-> 私有库中的笔记内容格式必须为：
-> 
->       [描述1](https://www.baidu.com)<br>
->       [描述2](https://www.baidu.com)<br>
-
-然后运行
+复制 `.env.example` 为 `.env`, 修改里面的参数为自己的配置。 然后运行
 
 ```go
 go run main.go
 ```
 
 ## Docker部署
+
+### docker 直接运行
+
+```docker
+docker run --name resource \
+    -e GITHUB_TOKEN="xxx" \
+    -e GITHUB_OWNER="xxx" \
+    -e GITHUB_REPO="xxx" \
+    -p 8080:8080 \
+    -d ghcr.io/xiaoxuan6/resource:latest
+```
+
+### Docker-compose
 
 环境要求：Git、Docker、Docker-Compose
 
