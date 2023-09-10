@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  server:
+    image: ghcr.io/xiaoxuan6/resource:latest
+    container_name: resource
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - "$PWD/.env:/app/.env"

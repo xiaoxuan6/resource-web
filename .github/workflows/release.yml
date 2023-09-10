@@ -1,0 +1,53 @@
+name: "Create Release"
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release-win:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+      - name: build
+        run: |
+          make build
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+      - name: Upload release
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./resource
+          asset_name: resource
+          asset_content_type: application/zip
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: release-win
+    steps:
+      - uses: actions/checkout@v1
+      - uses: azure/docker-login@v1
+        with:
+          login-server: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: build image
+        run: |
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          echo "输出版本号：$VERSION"
+          docker build -t ghcr.io/xiaoxuan6/resource:$VERSION .
+          docker push ghcr.io/xiaoxuan6/resource:$VERSION
+          docker logout
