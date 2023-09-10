@@ -10,8 +10,8 @@ RUN go build -ldflags "-s -w" -o resource .
 
 FROM alpine
 
-COPY --from=builder /src/resource /app
-COPY --from=builder /src/.env.example /.env
+COPY --from=builder /src/resource /app/resource
+COPY --from=builder /src/.env.example /app/.env
 
 WORKDIR /app
 
