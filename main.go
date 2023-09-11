@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"embed"
+	"encoding/json"
 	"github.com/google/go-github/v48/github"
 	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
@@ -61,7 +62,7 @@ func main() {
 	wg.Wait()
 
 	http.HandleFunc("/", tplHandler)
-	//http.HandleFunc("/refresh", refreshHandler)
+	http.HandleFunc("/refresh", refreshHandler)
 
 	//加载静态文件
 	fs := http.FileServer(http.FS(dirStatic))
@@ -102,6 +103,14 @@ func fetchContent(filename string, wg *sync.WaitGroup) {
 	}
 
 	contents := strings.Split(content, "\n")
+
+	// 数据相同直接返回
+	if cache, ok := dbMap[filename]; ok {
+		if len(contents) == len(cache.Items) {
+			return
+		}
+	}
+
 	var items []item
 	for _, val := range contents {
 		url := regexpUrl(val)
@@ -188,12 +197,23 @@ func fetchDatas() (datas []data) {
 	return
 }
 
-//func refreshHandler(w http.ResponseWriter, r *http.Request)  {
-//	for _, val := range menu.Values {
-//		wg.Add(1)
-//		go fetchContent(val, &wg)
-//	}
-//	wg.Wait()
-//
-//	w.Write([]byte("刷新成功"))
-//}
+func refreshHandler(w http.ResponseWriter, r *http.Request) {
+	for _, val := range menu.Values {
+		wg.Add(1)
+		go fetchContent(val, &wg)
+	}
+	wg.Wait()
+
+	w.Header().Set("content-type", "text/json")
+
+	response := struct {
+		Status int    `json:"status"`
+		Msg    string `json:"msg"`
+	}{
+		Status: 200,
+		Msg:    "ok",
+	}
+
+	msg, _ := json.Marshal(response)
+	_, _ = w.Write(msg)
+}

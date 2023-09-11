@@ -69,7 +69,10 @@
 <div id="app">
     <el-container>
         <el-header>
-            <h1>Resource</h1>
+            <h1>
+                Resource
+                <span style="float: right" onclick="refresh()">刷新数据</span>
+            </h1>
         </el-header>
         <el-main v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="拼命加载中">
             <el-row :gutter="20">
@@ -86,9 +89,9 @@
                             <el-list key="<< $i >>">
                                 <el-list-item>
                                     <div class="list-item-title">
-                          <span>
-                            << inc $i >>.
-                          </span>
+                                      <span>
+                                        << inc $i >>.
+                                      </span>
                                         <el-link href="<< $item.Url >>" target="_blank" title="<< $item.Title >>">
                                             << $item.Title >>
                                         </el-link>
@@ -110,8 +113,7 @@
                                 <el-list-item>
                                     <div class="list-item-title">
                                         <span>{{ i+1 }}. </span>
-                                        <el-link :href="item.url" target="_blank" :title="item.title">{{ item.title
-                                            }}
+                                        <el-link :href="item.url" target="_blank" :title="item.title">{{ item.title }}
                                         </el-link>
                                     </div>
                                 </el-list-item>
@@ -131,7 +133,8 @@
 
 <!-- <script src="https://unpkg.com/vue@next"></script> -->
 <script src="static/vue.global.prod.js"></script>
-
+<!--<script src="https://unpkg.com/axios/dist/axios.min.js"></script>-->
+<script src="static/axios.min.js"></script>
 <!-- <script src="https://cdn.bootcdn.net/ajax/libs/element-plus/2.3.3/index.full.js"></script> -->
 <script src="static/index.full.min.js"></script>
 <script>
@@ -150,6 +153,23 @@
 
     app.use(ElementPlus);
     app.mount("#app");
+
+    function refresh() {
+        axios.get('/refresh')
+            // 请求响应成功
+            .then(function (response){
+                if(response.data.status != 200) {
+                    console.log(response.data.msg)
+                    return
+                }
+
+                window.location.reload()
+            })
+            // 请求响应失败
+            .catch(function (error) {
+                console.log(error)
+            })
+    }
 </script>
 </body>
 </html>
