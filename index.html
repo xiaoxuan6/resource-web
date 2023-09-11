@@ -137,6 +137,9 @@
 <script src="static/axios.min.js"></script>
 <!-- <script src="https://cdn.bootcdn.net/ajax/libs/element-plus/2.3.3/index.full.js"></script> -->
 <script src="static/index.full.min.js"></script>
+
+<script src="http://cdn.bootcss.com/jquery/1.12.3/jquery.min.js"></script>
+<script src="static/layer/layer.js"></script>
 <script>
     const app = Vue.createApp({
         data() {
@@ -157,13 +160,16 @@
     function refresh() {
         axios.get('/refresh')
             // 请求响应成功
-            .then(function (response){
-                if(response.data.status != 200) {
+            .then(function (response) {
+                if (response.data.status != 200) {
                     console.log(response.data.msg)
                     return
                 }
 
-                window.location.reload()
+                layer.msg('刷新成功');
+                setTimeout(function (){
+                    window.location.reload()
+                }, 3000)
             })
             // 请求响应失败
             .catch(function (error) {

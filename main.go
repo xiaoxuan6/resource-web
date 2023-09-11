@@ -198,6 +198,7 @@ func fetchDatas() (datas []data) {
 }
 
 func refreshHandler(w http.ResponseWriter, r *http.Request) {
+	menu = fetchMenus()
 	for _, val := range menu.Values {
 		wg.Add(1)
 		go fetchContent(val, &wg)
