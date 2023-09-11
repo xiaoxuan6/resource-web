@@ -1,3 +1,5 @@
+![img](./1694403591383.png)
+
 # 简述
     将 github 私有库中的笔记，渲染到 web 网站上。
 
@@ -55,5 +57,13 @@ docker-compose up -d
 
 部署成功后，通过 `ip + 端口号` 访问，默认端口为：`8080`
 
+# FAQ
+
+为什么不使用 `websocket`, 而使用 `axios` 请求?
+
+答：项目中调用了 `api.github` 频繁访问可能会导致请求失败，会被 `github` 拉黑
+
 # 相关
 [cli 模式](https://github.com/xiaoxuan6/rsearch)
+
+[向储存库中提交代码：search ap "\[描述\](链接)"](https://github.com/xiaoxuan6/search)
