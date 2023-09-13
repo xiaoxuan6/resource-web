@@ -6,63 +6,11 @@
     <title>Resource</title>
     <meta name="description" content='Resource，将 github 中的笔记渲染的页面'>
     <meta name="anthor" content="xiaoxuan6">
-    <!-- <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"> -->
-    <link rel="stylesheet" href="static/index.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <link rel="icon" href="static/favicon.svg" type="image/x-icon">
-    <style>
-        body {
-            font-family: "Avenir", Helvetica, Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            text-align: center;
-            color: #2c3e50;
-            margin-top: 30px;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .list-item {
-            display: flex;
-            align-items: center;
-            text-align: left;
-            width: 100%;
-        }
-
-        .list-item-title {
-            display: flex;
-            /* white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis; */
-            flex-grow: 1;
-            text-align: left;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        a {
-            color: black;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .feed-col {
-            margin-bottom: 20px;
-        }
-
-        .time {
-            font-size: 12px;
-            color: #999;
-        }
-    </style>
+    <link rel="stylesheet" href="static/notiflix-3.2.6.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css">
+    <link rel="stylesheet" href="static/index.css">
 </head>
 
 <body>
@@ -133,49 +81,12 @@
 
 <!-- <script src="https://unpkg.com/vue@next"></script> -->
 <script src="static/vue.global.prod.js"></script>
-<!--<script src="https://unpkg.com/axios/dist/axios.min.js"></script>-->
-<script src="static/axios.min.js"></script>
-<!-- <script src="https://cdn.bootcdn.net/ajax/libs/element-plus/2.3.3/index.full.js"></script> -->
-<script src="static/index.full.min.js"></script>
-
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/element-plus/2.3.3/index.full.js"></script>
 <script src="http://cdn.bootcss.com/jquery/1.12.3/jquery.min.js"></script>
-<script src="static/layer/layer.js"></script>
-<script>
-    const app = Vue.createApp({
-        data() {
-            return {
-                feeds: [],
-                showSEOFlag: true,
-                fullscreenLoading: true,
-            };
-        },
-        async created() {
-            this.fullscreenLoading = false;
-        }
-    });
-
-    app.use(ElementPlus);
-    app.mount("#app");
-
-    function refresh() {
-        axios.get('/refresh')
-            // 请求响应成功
-            .then(function (response) {
-                if (response.data.status != 200) {
-                    console.log(response.data.msg)
-                    return
-                }
-
-                layer.msg('刷新成功');
-                setTimeout(function (){
-                    window.location.reload()
-                }, 3000)
-            })
-            // 请求响应失败
-            .catch(function (error) {
-                console.log(error)
-            })
-    }
-</script>
+<script src="static/notiflix-3.2.6.min.js"></script>
+<!-- <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.js">-->
+<script src="static/nprogress.js"></script>
+<script src="static/index.js"></script>
 </body>
 </html>
