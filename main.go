@@ -40,6 +40,7 @@ var (
 	dirStatic embed.FS
 	//go:embed index.html
 	fileIndex embed.FS
+	client    *github.Client
 )
 
 func init() {
@@ -54,6 +55,12 @@ func main() {
 		return
 	}
 
+	token := os.Getenv("GITHUB_TOKEN")
+	if token == "" || strings.HasPrefix(token, "xx") || strings.HasPrefix(token, "ghp_") == false {
+		log.Fatal("Error loading GITHUB_TOKEN")
+		return
+	}
+
 	menu = fetchMenus()
 	for _, val := range menu.Values {
 		wg.Add(1)
@@ -64,20 +71,19 @@ func main() {
 	http.HandleFunc("/", tplHandler)
 	http.HandleFunc("/refresh", refreshHandler)
 
-	//加载静态文件
 	fs := http.FileServer(http.FS(dirStatic))
 	http.Handle("/static/", fs)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":18080", nil))
 }
 
-func client() (client *github.Client) {
+func newClient() {
 	oauth := oauth2.NewClient(c, oauth2.StaticTokenSource(&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")}))
 	client = github.NewClient(oauth)
-	return
 }
 
 func fetchMenus() (menu Menu) {
-	_, directoryContent, _, _ := client().Repositories.GetContents(c, os.Getenv("GITHUB_OWNER"), os.Getenv("GITHUB_REPO"), "", &github.RepositoryContentGetOptions{})
+	newClient()
+	_, directoryContent, _, _ := client.Repositories.GetContents(c, os.Getenv("GITHUB_OWNER"), os.Getenv("GITHUB_REPO"), "", &github.RepositoryContentGetOptions{})
 
 	var values []string
 	for _, val := range directoryContent {
@@ -92,7 +98,7 @@ func fetchMenus() (menu Menu) {
 
 func fetchContent(filename string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	repositoryContent, _, _, err := client().Repositories.GetContents(c, os.Getenv("GITHUB_OWNER"), os.Getenv("GITHUB_REPO"), filename, &github.RepositoryContentGetOptions{})
+	repositoryContent, _, _, err := client.Repositories.GetContents(c, os.Getenv("GITHUB_OWNER"), os.Getenv("GITHUB_REPO"), filename, &github.RepositoryContentGetOptions{})
 	if err != nil {
 		return
 	}
@@ -153,29 +159,25 @@ func regexpUrl(str string) string {
 }
 
 func tplHandler(w http.ResponseWriter, r *http.Request) {
-	// 创建一个新的模板，并设置自定义分隔符为<< >>，避免与Vue的语法冲突
 	tmplInstance := template.New("index.html").Delims("<<", ">>")
-	//添加加法函数计数
 	funcMap := template.FuncMap{
 		"inc": func(i int) int {
 			return i + 1
 		},
 	}
-	// 加载模板文件
+
 	tmpl, err := tmplInstance.Funcs(funcMap).ParseFS(fileIndex, "index.html")
 	if err != nil {
 		log.Println("模板加载错误:", err)
 		return
 	}
 
-	// 定义一个数据对象
 	dates := struct {
-		RssDataList []data
+		DataList []data
 	}{
-		RssDataList: fetchDatas(),
+		DataList: fetchDatas(),
 	}
 
-	// 渲染模板并将结果写入响应
 	err = tmpl.Execute(w, dates)
 	if err != nil {
 		log.Println("模板渲染错误:", err)

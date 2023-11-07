@@ -31,12 +31,7 @@ go run main.go
 ### docker 直接运行
 
 ```docker
-docker run --name resource \
-    -e GITHUB_TOKEN="xxx" \
-    -e GITHUB_OWNER="xxx" \
-    -e GITHUB_REPO="xxx" \
-    -p 8080:8080 \
-    -d ghcr.io/xiaoxuan6/resource:latest
+docker run -it --name resource -e GITHUB_TOKEN="xxx" -e GITHUB_OWNER="xxx" -e GITHUB_REPO="xxx" -p 8080:8080 -d ghcr.io/xiaoxuan6/resource:latest
 ```
 
 ### Docker-compose
