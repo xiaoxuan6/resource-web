@@ -38,13 +38,7 @@ docker run -it --name resource -e GITHUB_TOKEN="xxx" -e GITHUB_OWNER="xxx" -e GI
 
 环境要求：Git、Docker、Docker-Compose
 
-克隆项目
-
-```bash
-git clone https://github.com/xiaoxuan6/resource-web.git
-```
-
-进入 `resource-web` 文件夹，运行项目
+复制 `docker-compose.yml`, 修改里面的 `environment` 参数为自己的配置。
 
 ```bash
 docker-compose up -d

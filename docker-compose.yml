@@ -8,4 +8,4 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - "$PWD/.env:/app/.env"
+      - $PWD/.env:/app/.env

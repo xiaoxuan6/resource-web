@@ -70,10 +70,8 @@ func main() {
 
 	http.HandleFunc("/", tplHandler)
 	http.HandleFunc("/refresh", refreshHandler)
-
-	fs := http.FileServer(http.FS(dirStatic))
-	http.Handle("/static/", fs)
-	log.Fatal(http.ListenAndServe(":18080", nil))
+	http.Handle("/static/", http.FileServer(http.FS(dirStatic)))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func newClient() {
