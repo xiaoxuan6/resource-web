@@ -41,8 +41,8 @@ changelog:
       - '^docs:'
       - '^test:'
   groups:
-    - title: 'Bug Fixs'
-      regexp: '^fix:'
-    - title: 'Features'
-      regexp: '^feat:'
-    - title: 'Others'
+    - title: '🚀 Features'
+      regexp: 'feat:'
+    - title: '🐛 Bug Fixes'
+      regexp: 'fix:'
+    - title: '🔨 Others'

@@ -1,0 +1,14 @@
+.idea
+.env
+resource
+dist/
+.github/
+.gitignore
+.gitattributes
+.goreleaser.yaml
+1694403591383.png
+LICENSE
+Makefile
+README.md
+resource
+docker-compose.yml
