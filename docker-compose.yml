@@ -7,5 +7,7 @@ services:
     restart: always
     ports:
       - "8080:8080"
-    volumes:
-      - $PWD/.env:/app/.env
+    environment:
+      GITHUB_OWNER: "xiaoxuan6"
+      GITHUB_REPO: "resource"
+      GITHUB_TOKEN: "xxx"

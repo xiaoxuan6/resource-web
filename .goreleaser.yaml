@@ -33,6 +33,8 @@ archives:
         format: zip
     files:
       - .env.example
+      - README.md
+      - LICENSE
 
 changelog:
   sort: asc
