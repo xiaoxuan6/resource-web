@@ -1,6 +1,7 @@
 before:
   hooks:
     - go mod tidy
+    - cp .env.example .env
 
 builds:
   - env:
@@ -32,7 +33,7 @@ archives:
       - goos: windows
         format: zip
     files:
-      - .env.example
+      - .env
       - README.md
       - LICENSE
 
