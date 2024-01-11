@@ -51,22 +51,33 @@ func init() {
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal("Error: loading .env file fail")
 		return
 	}
 
 	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" || strings.HasPrefix(token, "xx") || strings.HasPrefix(token, "ghp_") == false {
-		log.Fatal("Error loading GITHUB_TOKEN")
+		log.Fatal("Error: loading GITHUB_TOKEN fail")
 		return
 	}
 
 	menu = fetchMenus()
+	ch := make(chan map[string]bool)
 	for _, val := range menu.Values {
 		wg.Add(1)
-		go fetchContent(val, &wg)
+		go fetchContent(val, &wg, ch)
 	}
-	wg.Wait()
+
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	for val := range ch {
+		for k, v := range val {
+			log.Printf("%s fetch status: %#v", k, v)
+		}
+	}
 
 	http.HandleFunc("/", tplHandler)
 	http.HandleFunc("/refresh", refreshHandler)
@@ -81,7 +92,11 @@ func newClient() {
 
 func fetchMenus() (menu Menu) {
 	newClient()
-	_, directoryContent, _, _ := client.Repositories.GetContents(c, os.Getenv("GITHUB_OWNER"), os.Getenv("GITHUB_REPO"), "", &github.RepositoryContentGetOptions{})
+	_, directoryContent, _, err := client.Repositories.GetContents(c, os.Getenv("GITHUB_OWNER"), os.Getenv("GITHUB_REPO"), "", &github.RepositoryContentGetOptions{})
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	var values []string
 	for _, val := range directoryContent {
@@ -94,15 +109,17 @@ func fetchMenus() (menu Menu) {
 	return menu
 }
 
-func fetchContent(filename string, wg *sync.WaitGroup) {
+func fetchContent(filename string, wg *sync.WaitGroup, ch chan map[string]bool) {
 	defer wg.Done()
 	repositoryContent, _, _, err := client.Repositories.GetContents(c, os.Getenv("GITHUB_OWNER"), os.Getenv("GITHUB_REPO"), filename, &github.RepositoryContentGetOptions{})
 	if err != nil {
+		ch <- map[string]bool{filename: false}
 		return
 	}
 
 	content, err2 := repositoryContent.GetContent()
 	if err2 != nil {
+		ch <- map[string]bool{filename: false}
 		return
 	}
 
@@ -135,6 +152,8 @@ func fetchContent(filename string, wg *sync.WaitGroup) {
 		Items: items,
 	}
 	lock.Unlock()
+
+	ch <- map[string]bool{filename: true}
 }
 
 func regexpTitle(str string) string {
@@ -199,11 +218,23 @@ func fetchDatas() (datas []data) {
 
 func refreshHandler(w http.ResponseWriter, r *http.Request) {
 	menu = fetchMenus()
+
+	ch := make(chan map[string]bool)
 	for _, val := range menu.Values {
 		wg.Add(1)
-		go fetchContent(val, &wg)
+		go fetchContent(val, &wg, ch)
 	}
-	wg.Wait()
+
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	for val := range ch {
+		for k, v := range val {
+			log.Printf("%s fetch status: %#v", k, v)
+		}
+	}
 
 	w.Header().Set("content-type", "text/json")
 
